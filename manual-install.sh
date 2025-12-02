@@ -56,8 +56,8 @@ fi
 
 cat > /opt/perseus/Backend/.env << EOF
 HUGGINGFACE_TOKEN=$HF_TOKEN
-BINARY_MODEL_NAME=SamuelSoto7/PerseusV8_Binario
-MULTICLASS_MODEL_NAME=SamuelSoto7/PerseusV2_Multiclass
+BINARY_MODEL_NAME=SamuelSoto7/Perseus_binario
+MULTICLASS_MODEL_NAME=SamuelSoto7/Perseus_Multiclase
 PROVIDER=$LLM_PROVIDER
 GROQ_API_KEY=$GROQ_KEY
 GROQ_MODEL_NAME=llama-3.1-8b-instant

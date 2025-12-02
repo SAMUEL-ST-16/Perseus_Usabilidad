@@ -153,13 +153,13 @@ echo ""
 read -p "HuggingFace Token (obligatorio): " HF_TOKEN
 read -p "Groq API Key (recomendado, presiona Enter para omitir): " GROQ_KEY
 read -p "OpenAI API Key (opcional, presiona Enter para omitir): " OPENAI_KEY
-read -p "Nombre modelo binario [SamuelSoto7/PerseusV8_Binario]: " BINARY_MODEL
-read -p "Nombre modelo multiclase [SamuelSoto7/PerseusV2_Multiclass]: " MULTICLASS_MODEL
+read -p "Nombre modelo binario [SamuelSoto7/Perseus_binario]: " BINARY_MODEL
+read -p "Nombre modelo multiclase [SamuelSoto7/Perseus_Multiclase]: " MULTICLASS_MODEL
 read -p "Tu dominio (ej: perseus.com, presiona Enter para usar IP): " DOMAIN
 
 # Valores por defecto
-BINARY_MODEL=${BINARY_MODEL:-SamuelSoto7/PerseusV8_Binario}
-MULTICLASS_MODEL=${MULTICLASS_MODEL:-SamuelSoto7/PerseusV2_Multiclass}
+BINARY_MODEL=${BINARY_MODEL:-SamuelSoto7/Perseus_binario}
+MULTICLASS_MODEL=${MULTICLASS_MODEL:-SamuelSoto7/Perseus_Multiclase}
 
 # Detectar IP pública del droplet
 PUBLIC_IP=$(curl -s ifconfig.me)

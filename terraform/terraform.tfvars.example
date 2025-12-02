@@ -16,14 +16,14 @@ droplet_region = "nyc1"
 droplet_size = "s-1vcpu-2gb"
 
 # ========== GitHub Repository ==========
-github_repo = "https://github.com/tu-usuario/ExtractReq.git"
+github_repo = "https://github.com/tu-usuario/Perseus_Usabilidad.git"
 
 # ========== HuggingFace Configuration ==========
 huggingface_token = "hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # Modelos (usar valores por defecto o cambiar por los tuyos)
-binary_model_name     = "SamuelSoto7/ExtractReqV8_Binario"
-multiclass_model_name = "SamuelSoto7/ExtractReqV2_Multiclass"
+binary_model_name     = "SamuelSoto7/Perseus_binario"
+multiclass_model_name = "SamuelSoto7/Perseus_Multiclase"
 
 # ========== LLM Provider Configuration ==========
 # Opciones: "groq" (gratis), "openai" (pago), "none"
@@ -37,4 +37,4 @@ groq_api_key = "gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # ========== Optional Domain ==========
 # Si tienes un dominio registrado, descomenta y configura
-# domain_name = "extractreq.com"
+# domain_name = "perseus.com"

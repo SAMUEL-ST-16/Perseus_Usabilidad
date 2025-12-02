@@ -150,13 +150,13 @@ El script te pedirá:
 
 5. **Nombre del modelo binario**
    ```
-   Por defecto: SamuelSoto7/PerseusV8_Binario
+   Por defecto: SamuelSoto7/Perseus_binario
    Presiona Enter para usar el valor por defecto
    ```
 
 6. **Nombre del modelo multiclase**
    ```
-   Por defecto: SamuelSoto7/PerseusV2_Multiclass
+   Por defecto: SamuelSoto7/Perseus_Multiclase
    Presiona Enter para usar el valor por defecto
    ```
 

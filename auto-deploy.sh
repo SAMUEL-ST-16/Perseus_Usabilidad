@@ -109,7 +109,7 @@ echo ""
 echo -e "${BLUE}──────────────────────────────────────${NC}"
 echo -e "${GREEN}2. Repositorio de GitHub${NC}"
 echo "   Debe ser la URL completa de tu repositorio"
-echo "   Ejemplo: https://github.com/tu-usuario/Perseus.git"
+echo "   Ejemplo: https://github.com/tu-usuario/Perseus_Usabilidad.git"
 echo ""
 read -p "URL del repositorio: " GITHUB_REPO
 
@@ -173,11 +173,11 @@ echo ""
 echo -e "${BLUE}──────────────────────────────────────${NC}"
 echo -e "${GREEN}7. Modelos de HuggingFace${NC}"
 echo ""
-read -p "Modelo binario [SamuelSoto7/PerseusV8_Binario]: " BINARY_MODEL
-BINARY_MODEL=${BINARY_MODEL:-SamuelSoto7/PerseusV8_Binario}
+read -p "Modelo binario [SamuelSoto7/Perseus_binario]: " BINARY_MODEL
+BINARY_MODEL=${BINARY_MODEL:-SamuelSoto7/Perseus_binario}
 
-read -p "Modelo multiclase [SamuelSoto7/PerseusV2_Multiclass]: " MULTICLASS_MODEL
-MULTICLASS_MODEL=${MULTICLASS_MODEL:-SamuelSoto7/PerseusV2_Multiclass}
+read -p "Modelo multiclase [SamuelSoto7/Perseus_Multiclase]: " MULTICLASS_MODEL
+MULTICLASS_MODEL=${MULTICLASS_MODEL:-SamuelSoto7/Perseus_Multiclase}
 
 # Determinar LLM provider
 if [ ! -z "$GROQ_KEY" ]; then

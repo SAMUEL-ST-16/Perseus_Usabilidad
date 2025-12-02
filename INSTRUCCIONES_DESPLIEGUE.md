@@ -54,7 +54,7 @@ git add .
 git commit -m "Initial commit - Perseus with Terraform deployment"
 
 # Agregar remote (REEMPLAZA TU_USUARIO con tu usuario de GitHub)
-git remote add origin https://github.com/TU_USUARIO/Perseus.git
+git remote add origin https://github.com/TU_USUARIO/Perseus_Usabilidad.git
 
 # Renombrar rama a main
 git branch -M main

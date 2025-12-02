@@ -47,13 +47,13 @@ variable "huggingface_token" {
 variable "binary_model_name" {
   description = "Nombre del modelo binario en HuggingFace"
   type        = string
-  default     = "SamuelSoto7/PerseusV8_Binario"
+  default     = "SamuelSoto7/Perseus_binario"
 }
 
 variable "multiclass_model_name" {
   description = "Nombre del modelo multiclase en HuggingFace"
   type        = string
-  default     = "SamuelSoto7/PerseusV2_Multiclass"
+  default     = "SamuelSoto7/Perseus_Multiclase"
 }
 
 # ========== LLM Provider Configuration ==========

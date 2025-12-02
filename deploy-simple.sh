@@ -62,7 +62,7 @@ cp terraform.tfvars terraform.tfvars.bak
 
 # Reemplazar placeholder de SSH key y GitHub repo
 sed -i "s|ssh_public_key = \"PLACEHOLDER - Se reemplazará por auto-deploy.sh\"|ssh_public_key = \"$SSH_PUBLIC_KEY\"|" terraform.tfvars
-sed -i "s|github_repo = \"https://github.com/TU_USUARIO/Perseus.git\"|github_repo = \"$GITHUB_REPO\"|" terraform.tfvars
+sed -i "s|github_repo = \"https://github.com/TU_USUARIO/Perseus_Usabilidad.git\"|github_repo = \"$GITHUB_REPO\"|" terraform.tfvars
 
 # Eliminar copia de respaldo si todo salió bien
 rm -f terraform.tfvars.bak

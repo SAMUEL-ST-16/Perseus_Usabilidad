@@ -22,8 +22,8 @@ echo ""
 
 echo "==> 3. Leyendo valores actuales:"
 HF_TOKEN=$(grep HUGGINGFACE /opt/perseus/Backend/.env | cut -d'=' -f2 || echo "")
-BINARY_MODEL=$(grep BINARY_MODEL_NAME /opt/perseus/Backend/.env | cut -d'=' -f2 || echo "SamuelSoto7/PerseusV8_Binario")
-MULTICLASS_MODEL=$(grep MULTICLASS_MODEL_NAME /opt/perseus/Backend/.env | cut -d'=' -f2 || echo "SamuelSoto7/PerseusV2_Multiclass")
+BINARY_MODEL=$(grep BINARY_MODEL_NAME /opt/perseus/Backend/.env | cut -d'=' -f2 || echo "SamuelSoto7/Perseus_binario")
+MULTICLASS_MODEL=$(grep MULTICLASS_MODEL_NAME /opt/perseus/Backend/.env | cut -d'=' -f2 || echo "SamuelSoto7/Perseus_Multiclase")
 GROQ_KEY=$(grep GROQ_API_KEY /opt/perseus/Backend/.env | cut -d'=' -f2 || echo "")
 OPENAI_KEY=$(grep OPENAI_API_KEY /opt/perseus/Backend/.env | cut -d'=' -f2 || echo "")
 

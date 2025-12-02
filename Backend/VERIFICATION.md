@@ -60,8 +60,8 @@ Backend/
 
 ### Modelos de HuggingFace
 
-- **Modelo Binario**: `SamuelSoto7/PerseusV8_Binario`
-- **Modelo Multiclase**: `SamuelSoto7/PerseusV2_Multiclass`
+- **Modelo Binario**: `SamuelSoto7/Perseus_binario`
+- **Modelo Multiclase**: `SamuelSoto7/Perseus_Multiclase`
 
 ### Tokens Configurados
 
