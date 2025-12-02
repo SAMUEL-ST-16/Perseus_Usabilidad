@@ -1,0 +1,40 @@
+# Ejemplo de archivo de configuración de Terraform
+# Copia este archivo a terraform.tfvars y completa con tus valores reales
+
+# ========== DigitalOcean Configuration ==========
+do_token       = "dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... tu-usuario@tu-computadora"
+
+# Región del droplet (elige la más cercana)
+# Opciones: nyc1, nyc3, sfo3, lon1, fra1, sgp1, tor1
+droplet_region = "nyc1"
+
+# Tamaño del droplet
+# s-1vcpu-1gb ($6/mes) - 1GB RAM
+# s-1vcpu-2gb ($12/mes) - 2GB RAM (recomendado)
+# s-2vcpu-2gb ($18/mes) - 2 vCPUs, 2GB RAM
+droplet_size = "s-1vcpu-2gb"
+
+# ========== GitHub Repository ==========
+github_repo = "https://github.com/tu-usuario/ExtractReq.git"
+
+# ========== HuggingFace Configuration ==========
+huggingface_token = "hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# Modelos (usar valores por defecto o cambiar por los tuyos)
+binary_model_name     = "SamuelSoto7/ExtractReqV8_Binario"
+multiclass_model_name = "SamuelSoto7/ExtractReqV2_Multiclass"
+
+# ========== LLM Provider Configuration ==========
+# Opciones: "groq" (gratis), "openai" (pago), "none"
+llm_provider = "groq"
+
+# Groq API Key (GRATIS) - https://console.groq.com/keys
+groq_api_key = "gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# OpenAI API Key (PAGO) - https://platform.openai.com/api-keys
+# openai_api_key = "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# ========== Optional Domain ==========
+# Si tienes un dominio registrado, descomenta y configura
+# domain_name = "extractreq.com"

@@ -1,0 +1,656 @@
+/* ==================== RESULTS DASHBOARD - MODERN & COLORFUL ==================== */
+
+.results-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== HEADER ==================== */
+.dashboard-header {
+  margin-bottom: 2.5rem;
+}
+
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.title-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--primary);
+  animation: bounce 2s ease infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ==================== STATS GRID - Colores Pasteles Minimalistas ==================== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--stat-bg);
+  padding: 1.75rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+  border: 2px solid var(--stat-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  display: none;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Verde menta pastel */
+.stat-primary {
+  --stat-bg: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+  --stat-border: #6ee7b7;
+  --stat-color-1: #059669;
+  --stat-color-2: #10b981;
+}
+
+/* Azul cielo pastel */
+.stat-success {
+  --stat-bg: linear-gradient(135deg, #bae6fd 0%, #e0f2fe 100%);
+  --stat-border: #7dd3fc;
+  --stat-color-1: #0284c7;
+  --stat-color-2: #0ea5e9;
+}
+
+/* Rosa suave pastel */
+.stat-info {
+  --stat-bg: linear-gradient(135deg, #fbcfe8 0%, #fce7f3 100%);
+  --stat-border: #f9a8d4;
+  --stat-color-1: #db2777;
+  --stat-color-2: #ec4899;
+}
+
+/* Lavanda pastel */
+.stat-warning {
+  --stat-bg: linear-gradient(135deg, #ddd6fe 0%, #ede9fe 100%);
+  --stat-border: #c4b5fd;
+  --stat-color-1: #7c3aed;
+  --stat-color-2: #8b5cf6;
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  color: var(--stat-color-1);
+  filter: none;
+  flex-shrink: 0;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--stat-color-1);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.938rem;
+  color: #6b7280;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* ==================== TABS - Minimalista ==================== */
+.dashboard-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: #ffffff;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 2px solid #e5e7eb;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tab-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.tab-button:hover {
+  background: #f9fafb;
+  color: #059669;
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #059669;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
+}
+
+.tab-button.active .tab-icon {
+  color: #059669;
+}
+
+.export-button {
+  padding: 1rem 1.5rem;
+  border: 2px solid #059669;
+  background: transparent;
+  color: #059669;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.export-button:hover {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+}
+
+.pdf-button {
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+.pdf-button:hover {
+  background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%);
+  border-color: #0284c7;
+  color: #0284c7;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+}
+
+/* ==================== TABLE - Diseño Minimalista Pastel ==================== */
+.table-container {
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.results-table thead {
+  background: linear-gradient(135deg, #bae6fd 0%, #e0f2fe 100%);
+  color: #0c4a6e;
+}
+
+.results-table th {
+  padding: 1.25rem 1rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.results-table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.2s ease;
+  background: #ffffff;
+}
+
+.results-table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.results-table tbody tr:hover {
+  background: #f0fdf4;
+  transform: none;
+  box-shadow: none;
+}
+
+.results-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.results-table td {
+  padding: 1.25rem 1rem;
+  vertical-align: top;
+  color: #374151;
+}
+
+.col-icon {
+  width: 60px;
+}
+
+.col-comment {
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.col-subchar {
+  width: 200px;
+}
+
+.col-score {
+  width: 120px;
+}
+
+.col-description {
+  min-width: 250px;
+}
+
+.row-number {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%);
+  color: #0c4a6e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.938rem;
+  border: 2px solid #7dd3fc;
+}
+
+.comment-text {
+  color: #111827;
+  line-height: 1.6;
+  font-size: 0.938rem;
+  font-weight: 400;
+}
+
+.subchar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 1rem;
+  border-radius: 1.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.badge-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.badge-text {
+  font-weight: 700;
+}
+
+.score-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 0.625rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-align: center;
+  border: 2px solid;
+}
+
+/* Verde menta - High score */
+.score-high {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  border-color: #6ee7b7;
+}
+
+/* Amarillo cálido - Medium score */
+.score-medium {
+  background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+  color: #713f12;
+  border-color: #fde047;
+}
+
+/* Naranja coral - Low score */
+.score-low {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+  color: #7c2d12;
+  border-color: #fdba74;
+}
+
+/* Gris - None */
+.score-none {
+  background: #f9fafb;
+  color: #6b7280;
+  border-color: #e5e7eb;
+}
+
+.description-text {
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+/* ==================== STATS VIEW - Minimalista ==================== */
+.stats-container {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 2px solid #e5e7eb;
+}
+
+.stats-content {
+  display: grid;
+  gap: 3rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid #bae6fd;
+}
+
+/* ==================== BAR CHART - Minimalista ==================== */
+.bar-chart {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.chart-item {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.chart-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.label-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.label-text {
+  flex: 1;
+  font-size: 1rem;
+}
+
+.label-count {
+  color: #6b7280;
+  font-size: 0.938rem;
+  font-weight: 600;
+}
+
+.chart-bar-container {
+  height: 48px;
+  background: #f3f4f6;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #e5e7eb;
+}
+
+.chart-bar {
+  height: 100%;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 1rem;
+  transition: width 1s ease;
+  animation: growBar 1s ease;
+  box-shadow: none;
+}
+
+@keyframes growBar {
+  from { width: 0 !important; }
+}
+
+.bar-percentage {
+  color: white;
+  font-weight: 800;
+  font-size: 0.875rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ==================== DETAILED STATS CARDS - Minimalista ==================== */
+.detailed-stats {
+  margin-top: 2rem;
+}
+
+.stats-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.detailed-stat-card {
+  background: #ffffff;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.detailed-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.card-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-weight: 800;
+}
+
+.card-body {
+  padding: 1.5rem;
+  background: #fafafa;
+}
+
+.card-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.card-stat:last-child {
+  border-bottom: none;
+}
+
+.card-stat .stat-label {
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 0.938rem;
+}
+
+.card-stat .stat-value {
+  color: #111827;
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+/* ==================== NO RESULTS ==================== */
+.no-results {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.no-results-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  color: var(--muted-foreground);
+  opacity: 0.5;
+  animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+.no-results h3 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+}
+
+.no-results p {
+  font-size: 1.1rem;
+  color: var(--muted-foreground);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .results-table {
+    min-width: 1000px;
+  }
+}
+
+@media (max-width: 768px) {
+  .results-dashboard {
+    padding: 1rem;
+  }
+
+  .dashboard-title {
+    font-size: 2rem;
+  }
+
+  .title-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-tabs {
+    flex-direction: column;
+  }
+
+  .tab-button,
+  .export-button {
+    width: 100%;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+  }
+
+  .stats-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-title {
+    font-size: 1.5rem;
+  }
+
+  .title-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+  }
+}

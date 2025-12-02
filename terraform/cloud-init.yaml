@@ -1,0 +1,163 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - git
+  - curl
+  - wget
+  - build-essential
+  - software-properties-common
+  - nginx
+  - ufw
+  - certbot
+  - python3-certbot-nginx
+
+runcmd:
+  - echo "==> Instalando Python 3.11..."
+  - add-apt-repository -y ppa:deadsnakes/ppa
+  - apt-get update -y
+  - apt-get install -y python3.11 python3.11-venv python3.11-dev python3-pip
+  - update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+  - update-alternatives --set python3 /usr/bin/python3.11
+  - echo "==> Instalando Node.js 22 LTS desde binarios oficiales..."
+  - cd /tmp
+  - wget https://nodejs.org/dist/v22.12.0/node-v22.12.0-linux-x64.tar.xz
+  - tar -xJf node-v22.12.0-linux-x64.tar.xz
+  - cp -r node-v22.12.0-linux-x64/* /usr/local/
+  - ln -sf /usr/local/bin/node /usr/bin/node
+  - ln -sf /usr/local/bin/npm /usr/bin/npm
+  - node --version
+  - npm --version
+  - npm install -g @angular/cli@21
+  - echo "==> Creando usuario perseus..."
+  - useradd -m -s /bin/bash perseus || true
+  - echo "==> Clonando repositorio desde GitHub..."
+  - mkdir -p /opt/perseus
+  - cd /tmp
+  - git clone ${github_repo} perseus-temp
+  - cp -r perseus-temp/Backend /opt/perseus/
+  - cp -r perseus-temp/Frontend /opt/perseus/
+  - rm -rf perseus-temp
+  - echo "==> Configurando Backend..."
+  - cd /opt/perseus/Backend
+  - |
+    cat > /opt/perseus/Backend/.env << 'ENVEOF'
+    HUGGINGFACE_TOKEN=${hf_token}
+    BINARY_MODEL_NAME=${binary_model}
+    MULTICLASS_MODEL_NAME=${multiclass_model}
+    GROQ_API_KEY=${groq_key}
+    OPENAI_API_KEY=${openai_key}
+    PROVIDER=groq
+    HOST=0.0.0.0
+    PORT=8000
+    LOG_LEVEL=INFO
+    RELOAD=False
+    WORKERS=1
+    ENVEOF
+  - cd /opt/perseus/Backend
+  - python3.11 -m venv venv
+  - /opt/perseus/Backend/venv/bin/pip install --upgrade pip
+  - /opt/perseus/Backend/venv/bin/pip install -r requirements.txt
+  - echo "==> Compilando Frontend..."
+  - cd /opt/perseus/Frontend
+  - export PUBLIC_IP=$(curl -s ifconfig.me)
+  - |
+    cat > /opt/perseus/Frontend/src/environments/environment.prod.ts << 'TSEOF'
+    export const environment = {
+      production: true,
+      apiUrl: 'http://PLACEHOLDER_IP/api/requirements'
+    };
+    TSEOF
+  - sed -i "s/PLACEHOLDER_IP/$PUBLIC_IP/g" /opt/perseus/Frontend/src/environments/environment.prod.ts
+  - cd /opt/perseus/Frontend
+  - npm install
+  - npm run build -- --configuration production --optimization=false
+  - echo "==> Configurando servicio systemd..."
+  - |
+    cat > /etc/systemd/system/perseus-backend.service << 'SVCEOF'
+    [Unit]
+    Description=Perseus FastAPI Backend
+    After=network.target
+
+    [Service]
+    Type=simple
+    User=perseus
+    WorkingDirectory=/opt/perseus/Backend
+    Environment="PATH=/opt/perseus/Backend/venv/bin"
+    ExecStart=/opt/perseus/Backend/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
+    Restart=always
+    RestartSec=10
+
+    [Install]
+    WantedBy=multi-user.target
+    SVCEOF
+  - chown -R perseus:perseus /opt/perseus
+  - systemctl daemon-reload
+  - systemctl enable perseus-backend
+  - echo "==> Esperando a que el sistema se estabilice (60 segundos)..."
+  - sleep 60
+  - echo "==> Iniciando servicio backend..."
+  - systemctl start perseus-backend
+  - echo "==> Configurando Nginx..."
+  - |
+    cat > /etc/nginx/sites-available/perseus << 'NGXEOF'
+    server {
+        listen 80;
+        server_name _;
+        root /opt/perseus/Frontend/dist/Perseus/browser;
+        index index.html;
+        gzip on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
+        gzip_vary on;
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+        location /api/ {
+            proxy_pass http://127.0.0.1:8000/api/;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_connect_timeout 300s;
+            proxy_send_timeout 300s;
+            proxy_read_timeout 300s;
+        }
+        location /health {
+            proxy_pass http://127.0.0.1:8000/health;
+            proxy_set_header Host $host;
+        }
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+    }
+    NGXEOF
+  - ln -sf /etc/nginx/sites-available/perseus /etc/nginx/sites-enabled/
+  - rm -f /etc/nginx/sites-enabled/default
+  - nginx -t
+  - systemctl restart nginx
+  - systemctl enable nginx
+  - echo "==> Configurando firewall..."
+  - ufw --force enable
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow ssh
+  - ufw allow 'Nginx Full'
+  - echo "==> Despliegue completado!"
+  - |
+    cat > /root/deployment-info.txt << 'INFOEOF'
+    ================================================
+      Perseus - Deployment Information
+    ================================================
+    Deployed successfully via cloud-init
+    Check services with: systemctl status perseus-backend nginx
+    ================================================
+    INFOEOF
+  - cat /root/deployment-info.txt
+
+final_message: "Perseus deployment completed via cloud-init"

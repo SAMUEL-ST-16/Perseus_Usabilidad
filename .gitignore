@@ -1,0 +1,28 @@
+# Test files
+test_*.py
+test_*.json
+test_*.pdf
+
+# Generated files
+*.pdf
+flashscore_*.pdf
+
+# Environment variables (IMPORTANT: Protects API keys)
+.env
+.env.local
+.env.*.local
+Backend/.env
+Frontend/.env
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Node modules
+node_modules/

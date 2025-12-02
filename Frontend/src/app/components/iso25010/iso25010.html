@@ -1,0 +1,108 @@
+<div class="iso-container">
+  <!-- Header -->
+  <header class="iso-header">
+    <button class="back-btn" routerLink="/">
+      ← Volver al inicio
+    </button>
+    <h1 class="iso-title">{{ overview.title }}</h1>
+    <p class="iso-description">{{ overview.description }}</p>
+  </header>
+
+  <!-- Overview Section -->
+  <section class="overview-section">
+    <div class="overview-card">
+      <h2 class="section-title">Usabilidad en ISO/IEC 25010:2023</h2>
+      <p class="section-content">{{ overview.securityDescription }}</p>
+
+      <h3 class="subsection-title">Beneficios de aplicar ISO/IEC 25010:</h3>
+      <ul class="benefits-list">
+        @for (benefit of overview.benefits; track benefit) {
+          <li>{{ benefit }}</li>
+        }
+      </ul>
+
+      <div class="reference">
+        <strong>Referencia:</strong> {{ overview.reference }}
+      </div>
+    </div>
+  </section>
+
+  <!-- Subcharacteristics Section -->
+  <section class="subcharacteristics-section">
+    <h2 class="section-title-center">
+      Subcaracterísticas de Usabilidad
+    </h2>
+    <p class="section-subtitle-center">
+      Las 8 dimensiones de usabilidad según ISO/IEC 25010:2023
+    </p>
+
+    <div class="sub-grid">
+      @for (sub of subcharacteristics; track sub.name; let i = $index) {
+        <div
+          class="sub-card"
+          [class.expanded]="isExpanded(i)"
+          (click)="toggleDetails(i)"
+        >
+          <div class="sub-header">
+            <div class="sub-icon">
+              <!-- PLACEHOLDER para icono -->
+              <div class="icon-placeholder">
+                @switch (i) {
+                  @case (0) { 🎯 }
+                  @case (1) { 📚 }
+                  @case (2) { 😊 }
+                  @case (3) { ✅ }
+                  @case (4) { 🛡️ }
+                  @case (5) { ♿ }
+                  @case (6) { 💬 }
+                  @case (7) { 🆘 }
+                }
+              </div>
+            </div>
+            <div class="sub-header-content">
+              <h3 class="sub-title">{{ sub.name }}</h3>
+              <button class="expand-btn">
+                {{ isExpanded(i) ? '−' : '+' }}
+              </button>
+            </div>
+          </div>
+
+          <p class="sub-description">{{ sub.description }}</p>
+
+          @if (isExpanded(i)) {
+            <div class="sub-details" @expandCollapse>
+              <h4 class="examples-title">Ejemplos de implementación:</h4>
+              <ul class="examples-list">
+                @for (example of sub.examples; track example) {
+                  <li>{{ example }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="cta-section">
+    <div class="cta-card">
+      <h2 class="cta-title">¿Listo para analizar tus requisitos?</h2>
+      <p class="cta-description">
+        Utiliza nuestra herramienta para identificar automáticamente requisitos de usabilidad
+        basados en estas subcaracterísticas
+      </p>
+      <button class="cta-btn" routerLink="/">
+        Comenzar análisis →
+      </button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="iso-footer">
+    <p>
+      Esta información está basada en la norma ISO/IEC 25010:2023<br>
+      Para más información, consulta la <a href="https://iso25000.com/index.php/normas-iso-25000/iso-25010" target="_blank" rel="noopener noreferrer">documentación oficial</a>
+    </p>
+  </footer>
+</div>

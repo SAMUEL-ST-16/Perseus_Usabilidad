@@ -1,0 +1,428 @@
+<!-- HEADER -->
+<header class="header">
+  <div class="header-container">
+    <div class="header-content">
+      <div class="header-brand">
+        <svg class="header-logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <div class="header-info">
+          <h1 class="header-title">Perseus</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="header-version">
+          <svg class="version-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <span class="version-text">v1.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO SECTION -->
+<section class="hero-section">
+  <div class="hero-background"></div>
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="hero-logo-wrapper">
+        <div class="hero-logo-glow"></div>
+        <img src="assets/perseus-logo.png" alt="Perseus Logo" class="hero-logo-img" />
+      </div>
+      <div class="hero-text">
+        <h1 class="hero-title">Extracción de Requisitos de Usabilidad de Software</h1>
+        <p class="hero-description">
+          Analiza comentarios y reseñas de aplicaciones para identificar requisitos de usabilidad basados en el
+          estándar <span class="hero-highlight">ISO/IEC 25010:2023</span>
+        </p>
+      </div>
+      <div class="hero-status">
+        <div class="status-item">
+          <div class="status-dot"></div>
+          <span class="status-text">Sistema Activo</span>
+        </div>
+        <div class="status-divider"></div>
+        <div class="status-item">
+          <span class="status-text">ISO/IEC 25010:2023</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INPUT SECTION - 3 CARDS -->
+<section class="input-section">
+  <div class="section-header">
+    <h2 class="section-title">Fuentes de Datos</h2>
+    <p class="section-description">Selecciona uno de los tres métodos para ingresar los datos a analizar</p>
+  </div>
+
+  <div class="input-grid">
+    <!-- CARD 1: Play Store -->
+    <div class="input-card card-orange">
+      <div class="card-header-top">
+        <div class="card-icon-wrapper icon-orange">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div class="card-header-text">
+          <h3 class="card-title">Play Store</h3>
+          <p class="card-subtitle">Extrae reseñas de apps</p>
+        </div>
+      </div>
+
+      <div class="input-with-icon">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+        <input
+          type="url"
+          class="card-input"
+          [(ngModel)]="playStoreURL"
+          placeholder="https://play.google.com/store/..."
+          [disabled]="playStoreState().loading">
+      </div>
+      <p class="input-hint">Pega el enlace de la aplicación</p>
+
+      @if (playStoreState().loading) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>{{ playStoreState().message }}</p>
+        </div>
+      }
+
+      @if (playStoreState().error) {
+        <div class="error-message">
+          {{ playStoreState().error }}
+        </div>
+      }
+
+      @if (playStoreState().message && !playStoreState().loading) {
+        <div class="success-message">
+          {{ playStoreState().message }}
+        </div>
+      }
+
+      <button
+        class="card-button btn-orange"
+        (click)="onPlayStoreSubmit()"
+        [disabled]="playStoreState().loading || !playStoreURL().trim()">
+        @if (playStoreState().loading) {
+          <span class="btn-spinner"></span>
+          <span>Extrayendo...</span>
+        } @else {
+          <span>Extraer</span>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        }
+      </button>
+    </div>
+
+    <!-- CARD 2: Single Comment -->
+    <div class="input-card card-blue">
+      <div class="card-header-top">
+        <div class="card-icon-wrapper icon-blue">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        </div>
+        <div class="card-header-text">
+          <h3 class="card-title">Comentario</h3>
+          <p class="card-subtitle">Texto o reseña directa</p>
+        </div>
+      </div>
+
+      <textarea
+        class="card-textarea"
+        [(ngModel)]="singleComment"
+        rows="4"
+        placeholder="Introduce un comentario mayor a 10 palabras"
+        [disabled]="singleCommentState().loading"></textarea>
+
+      @if (singleCommentState().loading) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>{{ singleCommentState().message }}</p>
+        </div>
+      }
+
+      @if (singleCommentState().error) {
+        <div class="error-message">
+          {{ singleCommentState().error }}
+        </div>
+      }
+
+      @if (singleCommentState().message && !singleCommentState().loading) {
+        <div class="success-message">
+          {{ singleCommentState().message }}
+        </div>
+      }
+
+      <button
+        class="card-button btn-blue"
+        (click)="onSingleCommentSubmit()"
+        [disabled]="singleCommentState().loading || !singleComment().trim()">
+        @if (singleCommentState().loading) {
+          <span class="btn-spinner"></span>
+          <span>Analizando...</span>
+        } @else {
+          <span>Analizar</span>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        }
+      </button>
+    </div>
+
+    <!-- CARD 3: CSV File -->
+    <div class="input-card card-green">
+      <div class="card-header-top">
+        <div class="card-icon-wrapper icon-green">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <div class="card-header-text">
+          <h3 class="card-title">Archivo CSV</h3>
+          <p class="card-subtitle">Carga masiva de datos</p>
+        </div>
+      </div>
+
+      <div class="file-upload-area" [class.has-file]="csvFile()" (click)="fileInput.click()">
+        <input
+          #fileInput
+          type="file"
+          accept=".csv"
+          (change)="onFileSelected($event)"
+          [disabled]="csvState().loading"
+          style="display: none;">
+
+        @if (csvFile()) {
+          <div class="file-selected">
+            <svg class="file-check" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="file-name">{{ csvFileName() }}</span>
+            <button class="file-remove" (click)="clearCSV(); $event.stopPropagation()" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        } @else {
+          <div class="file-empty">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <p class="upload-text">Arrastra o haz clic</p>
+          </div>
+        }
+      </div>
+
+      @if (csvState().loading) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>{{ csvState().message }}</p>
+        </div>
+      }
+
+      @if (csvState().error) {
+        <div class="error-message">
+          {{ csvState().error }}
+        </div>
+      }
+
+      @if (csvState().message && !csvState().loading) {
+        <div class="success-message">
+          {{ csvState().message }}
+        </div>
+      }
+
+      <button
+        class="card-button btn-green"
+        (click)="onCSVSubmit()"
+        [disabled]="csvState().loading || !csvFile()">
+        @if (csvState().loading) {
+          <span class="btn-spinner"></span>
+          <span>Procesando...</span>
+        } @else {
+          <span>Procesar</span>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        }
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- USABILITY CHARACTERISTICS SECTION -->
+<section class="characteristics-section">
+  <div class="characteristics-card">
+    <div class="characteristics-header">
+      <div class="characteristics-title-wrapper">
+        <div class="title-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="characteristics-title">Subcaracterísticas de Usabilidad ISO/IEC 25010</h2>
+          <p class="characteristics-description">
+            La característica de Usabilidad en ISO/IEC 25010:2023 se divide en 8 subcaracterísticas que definen la facilidad de uso del sistema
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="characteristics-grid">
+      @for (characteristic of usabilityCharacteristics; track characteristic.id) {
+        <div
+          class="characteristic-item"
+          [class.expanded]="expandedCharacteristic() === characteristic.id"
+          (click)="toggleCharacteristic(characteristic.id)">
+          <div class="characteristic-content">
+            <div class="characteristic-header">
+              <div class="characteristic-icon" [class]="'icon-' + characteristic.color">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  @switch (characteristic.icon) {
+                    @case ('cursor-click') {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                    }
+                    @case ('academic-cap') {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z M12 14v6.25" />
+                    }
+                    @case ('heart') {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    }
+                    @case ('eye') {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    }
+                    @case ('shield-check') {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    }
+                    @case ('users') {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    }
+                    @case ('light-bulb') {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    }
+                    @case ('support') {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                    }
+                  }
+                </svg>
+              </div>
+              <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                @if (expandedCharacteristic() === characteristic.id) {
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                } @else {
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                }
+              </svg>
+            </div>
+            <h3 class="characteristic-name" [class]="'text-' + characteristic.color">{{ characteristic.name }}</h3>
+            <p class="characteristic-description">{{ characteristic.description }}</p>
+
+            @if (expandedCharacteristic() === characteristic.id) {
+              <div class="characteristic-details">
+                <div class="details-section">
+                  <p class="details-title">Aspectos clave:</p>
+                  <ul class="details-list">
+                    @for (detail of characteristic.details; track detail) {
+                      <li class="detail-item">
+                        <span class="detail-bullet" [class]="'bullet-' + characteristic.color"></span>
+                        <span>{{ detail }}</span>
+                      </li>
+                    }
+                  </ul>
+                </div>
+                <div class="example-box">
+                  <div class="example-header">
+                    <svg class="example-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="example-label">Ejemplo de comentario:</span>
+                  </div>
+                  <p class="example-text">"{{ characteristic.examples }}"</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="info-banner">
+      <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <p class="info-title">¿Cómo funciona el análisis?</p>
+        <p class="info-text">
+          El sistema utiliza procesamiento de lenguaje natural para identificar menciones relacionadas con cada
+          subcaracterística de usabilidad en los comentarios proporcionados, clasificándolos según el estándar ISO/IEC 25010:2023.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS DASHBOARD -->
+@if (hasResults() && currentResults()) {
+  <section class="results-section">
+    <app-results-dashboard
+      [results]="currentResults()!"
+      [pdfBlob]="currentPdfBlob()"
+      [pdfFileName]="currentPdfFileName()" />
+  </section>
+}
+
+<!-- DEMO MODE TOGGLE -->
+@if (demoMode()) {
+  <section class="demo-section">
+    <div class="demo-card">
+      <div class="demo-header">
+        <svg class="demo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+        <h3 class="demo-title">Modo Demostración</h3>
+      </div>
+      <p class="demo-description">Visualiza ejemplos de resultados con datos de muestra</p>
+      <div class="demo-buttons">
+        <button class="demo-btn demo-btn-blue" (click)="showDemoResults('single')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          Comentario
+        </button>
+        <button class="demo-btn demo-btn-green" (click)="showDemoResults('csv')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          CSV
+        </button>
+        <button class="demo-btn demo-btn-orange" (click)="showDemoResults('playstore')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          Play Store
+        </button>
+      </div>
+    </div>
+  </section>
+}
+
+<button class="demo-fab" (click)="toggleDemoMode()" [class.active]="demoMode()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    @if (demoMode()) {
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    } @else {
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+    }
+  </svg>
+</button>
