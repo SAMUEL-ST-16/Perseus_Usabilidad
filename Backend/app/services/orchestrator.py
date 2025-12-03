@@ -144,66 +144,84 @@ class OrchestratorService:
         max_total_reviews: int = 500
     ) -> Tuple[ProcessingResponse, BytesIO]:
         """
-        Smart processing of Google Play Store URL
-
-        Strategy:
-        1. Scrape comments with quality filters (2-3 stars, 15+ words)
-        2. Process progressively until finding target_requirements valid requirements
-        3. Stop if max_total_reviews is reached
-        4. Return detailed statistics
-
-        Args:
-            url: Play Store app URL
-            target_requirements: Target number of valid requirements (default: 30)
-            max_total_reviews: Maximum total reviews to scrape (default: 500)
-
-        Returns:
-            Tuple of (ProcessingResponse, PDF buffer)
+        Smart processing of Google Play Store URL with FULL RESULT CACHING
         """
+        from app.services.redis_service import redis_service
+        from app.core.config import settings
+        import hashlib
+        
         logger.info(f"Orchestrating Smart Play Store processing: {url}")
-        logger.info(f"Target: {target_requirements} requirements, Max: {max_total_reviews} reviews")
+        
+        # Generate cache key for the complete result
+        cache_key_params = f"{url}:{target_requirements}:{max_total_reviews}"
+        cache_hash = hashlib.md5(cache_key_params.encode()).hexdigest()
+        cache_key_response = f"perseus:complete:playstore:{cache_hash}"
+        
+        # Try to get complete cached result
+        cached_result = await redis_service.get(cache_key_response)
+        if cached_result is not None:
+            logger.info(f"🎯🎯🎯 FULL CACHE HIT for Play Store: {url}")
+            # Reconstruct response from cache
+            response = ProcessingResponse(**cached_result['response'])
+            # Regenerate PDF (PDFs don't cache well)
+            pdf_buffer = pdf_service.generate_pdf(response)
+            return response, pdf_buffer
+        
+        # No cache, process normally
+        logger.info(f"Cache MISS, processing Play Store: {url}")
         start_time = time.time()
-
+        
         # Smart scraping with filters (ASYNC)
         comments, scraping_stats = await scraper_service.get_comments_only_smart(
             url,
-            target_comments=target_requirements,  # Scrape enough filtered comments
+            target_comments=target_requirements,
             max_total=max_total_reviews
         )
-
+        
         logger.info(f"Smart scraping completed: {scraping_stats}")
         logger.info(f"Processing {len(comments)} filtered comments...")
-
+        
         # Process all filtered comments to find requirements (ASYNC)
         results = await processing_service.process_batch(comments, generate_descriptions=True)
-
+        
         # Get valid requirements
         valid_requirements = [r for r in results if r.is_requirement]
-
+        
         # Calculate processing time
         processing_time_ms = (time.time() - start_time) * 1000
-
+        
         # Build response with enhanced statistics
         response = ProcessingResponse(
-            total_comments=scraping_stats["total_scraped"],  # Total reviews checked
+            total_comments=scraping_stats["total_scraped"],
             valid_requirements=len(valid_requirements),
-            requirements=results,  # All processed results
+            requirements=results,
             processing_time_ms=processing_time_ms,
             source_type="playstore"
         )
-
-        # Add scraping statistics to response (for frontend display)
+        
+        # Add scraping statistics to response
         response.scraping_stats = scraping_stats
-
+        
+        # Cache the complete result (12 hours TTL)
+        try:
+            cache_data = {
+                'response': response.model_dump(),
+                'url': url
+            }
+            await redis_service.set(cache_key_response, cache_data, ttl=settings.CACHE_TTL_SCRAPING)
+            logger.info(f"✓ Cached complete result for {url}")
+        except Exception as e:
+            logger.warning(f"Failed to cache result: {e}")
+        
         # Generate PDF
         pdf_buffer = pdf_service.generate_pdf(response)
-
+        
         logger.info(
             f"✓ Play Store processing completed: "
             f"{len(valid_requirements)} requirements found from "
             f"{scraping_stats['total_scraped']} reviews in {processing_time_ms:.2f}ms"
         )
-
+        
         return response, pdf_buffer
 
     def _parse_csv(self, csv_text: str) -> List[str]:
