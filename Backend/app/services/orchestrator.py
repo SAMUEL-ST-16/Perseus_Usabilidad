@@ -43,8 +43,8 @@ class OrchestratorService:
         logger.info("Orchestrating single comment processing")
         start_time = time.time()
 
-        # Process comment
-        results = processing_service.process_batch([comment], generate_descriptions=True)
+        # Process comment (ASYNC)
+        results = await processing_service.process_batch([comment], generate_descriptions=True)
 
         # Calculate processing time
         processing_time_ms = (time.time() - start_time) * 1000
@@ -110,8 +110,8 @@ class OrchestratorService:
 
             logger.info(f"Extracted {len(comments)} comments from CSV")
 
-            # Process all comments
-            results = processing_service.process_batch(comments, generate_descriptions=True)
+            # Process all comments (ASYNC)
+            results = await processing_service.process_batch(comments, generate_descriptions=True)
 
             # Calculate processing time
             processing_time_ms = (time.time() - start_time) * 1000
@@ -164,8 +164,8 @@ class OrchestratorService:
         logger.info(f"Target: {target_requirements} requirements, Max: {max_total_reviews} reviews")
         start_time = time.time()
 
-        # Smart scraping with filters
-        comments, scraping_stats = scraper_service.get_comments_only_smart(
+        # Smart scraping with filters (ASYNC)
+        comments, scraping_stats = await scraper_service.get_comments_only_smart(
             url,
             target_comments=target_requirements,  # Scrape enough filtered comments
             max_total=max_total_reviews
@@ -174,8 +174,8 @@ class OrchestratorService:
         logger.info(f"Smart scraping completed: {scraping_stats}")
         logger.info(f"Processing {len(comments)} filtered comments...")
 
-        # Process all filtered comments to find requirements
-        results = processing_service.process_batch(comments, generate_descriptions=True)
+        # Process all filtered comments to find requirements (ASYNC)
+        results = await processing_service.process_batch(comments, generate_descriptions=True)
 
         # Get valid requirements
         valid_requirements = [r for r in results if r.is_requirement]

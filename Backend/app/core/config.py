@@ -79,6 +79,16 @@ class Settings(BaseSettings):
     ENABLE_CACHE: bool = os.getenv("ENABLE_CACHE", "True").lower() == "true"
     CACHE_TTL: int = int(os.getenv("CACHE_TTL", "3600"))  # 1 hour
 
+    # Redis Configuration
+    REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
+    REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_DB: int = int(os.getenv("REDIS_DB", "0"))
+
+    # Cache TTL Configuration (seconds)
+    CACHE_TTL_LLM: int = int(os.getenv("CACHE_TTL_LLM", "604800"))  # 7 days
+    CACHE_TTL_SCRAPING: int = int(os.getenv("CACHE_TTL_SCRAPING", "43200"))  # 12 hours
+    CACHE_TTL_ML: int = int(os.getenv("CACHE_TTL_ML", "86400"))  # 24 hours
+
     class Config:
         env_file = ".env"
         case_sensitive = True

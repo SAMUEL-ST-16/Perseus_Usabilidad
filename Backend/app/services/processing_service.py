@@ -3,6 +3,7 @@ Processing Service
 Handles the core logic of processing comments and extracting requirements
 """
 
+import asyncio
 from typing import List, Dict
 from app.services.huggingface_service import huggingface_service
 from app.schemas.requirements import BinaryPrediction, MulticlassPrediction, CommentAnalysis
@@ -42,13 +43,13 @@ class ProcessingService:
             logger.warning(f"Unknown binary label: {label}. Defaulting to not a requirement.")
             return False
 
-    def process_single_comment(
+    async def process_single_comment(
         self,
         comment: str,
         generate_description: bool = True
     ) -> CommentAnalysis:
         """
-        Process a single comment through binary and multiclass classification
+        Process a single comment through binary and multiclass classification - ASYNC
 
         Args:
             comment: Comment text to process
@@ -59,8 +60,13 @@ class ProcessingService:
         """
         logger.info(f"Processing comment: {comment[:100]}...")
 
-        # Step 1: Binary classification
-        binary_result = huggingface_service.predict_binary(comment)
+        # Step 1: Binary classification (run in thread pool as it's CPU-bound)
+        loop = asyncio.get_event_loop()
+        binary_result = await loop.run_in_executor(
+            None,
+            huggingface_service.predict_binary,
+            comment
+        )
         is_requirement = self._is_valid_requirement(binary_result['label'])
 
         binary_prediction = BinaryPrediction(
@@ -76,7 +82,11 @@ class ProcessingService:
         description = None
 
         if is_requirement:
-            multiclass_result = huggingface_service.predict_multiclass(comment)
+            multiclass_result = await loop.run_in_executor(
+                None,
+                huggingface_service.predict_multiclass,
+                comment
+            )
             multiclass_prediction = MulticlassPrediction(
                 label=multiclass_result['label'],
                 score=multiclass_result['score']
@@ -87,10 +97,10 @@ class ProcessingService:
                 f"(score: {multiclass_result['score']:.4f})"
             )
 
-            # Step 3: Generate description if requested
+            # Step 3: Generate description if requested (ASYNC)
             if generate_description:
                 from app.services.description_service import description_service
-                description = description_service.generate_description(
+                description = await description_service.generate_description(
                     comment=comment,
                     subcharacteristic=multiclass_result['label']
                 )
@@ -102,13 +112,13 @@ class ProcessingService:
             description=description
         )
 
-    def process_batch(
+    async def process_batch(
         self,
         comments: List[str],
         generate_descriptions: bool = True
     ) -> List[RequirementResult]:
         """
-        Process multiple comments efficiently
+        Process multiple comments efficiently with PARALLEL LLM calls - ASYNC
 
         Args:
             comments: List of comment texts
@@ -122,8 +132,13 @@ class ProcessingService:
         if not comments:
             return []
 
-        # Step 1: Binary classification for all comments
-        binary_results = huggingface_service.batch_predict_binary(comments)
+        # Step 1: Binary classification for all comments (run in thread pool)
+        loop = asyncio.get_event_loop()
+        binary_results = await loop.run_in_executor(
+            None,
+            huggingface_service.batch_predict_binary,
+            comments
+        )
 
         # Step 2: Filter valid requirements
         valid_indices = []
@@ -136,22 +151,35 @@ class ProcessingService:
 
         logger.info(f"Found {len(valid_comments)} valid requirements out of {len(comments)}")
 
-        # Step 3: Multiclass classification for valid requirements
+        # Step 3: Multiclass classification for valid requirements (run in thread pool)
         multiclass_results = []
         if valid_comments:
-            multiclass_results = huggingface_service.batch_predict_multiclass(valid_comments)
+            multiclass_results = await loop.run_in_executor(
+                None,
+                huggingface_service.batch_predict_multiclass,
+                valid_comments
+            )
 
-        # Step 4: Generate descriptions if requested
+        # Step 4: Generate descriptions if requested - PARALLEL EXECUTION ⚡
         descriptions = []
         if generate_descriptions and valid_comments:
             from app.services.description_service import description_service
-            descriptions = [
+
+            logger.info(f"🚀 Generating {len(valid_comments)} descriptions in PARALLEL...")
+
+            # Create tasks for parallel execution
+            description_tasks = [
                 description_service.generate_description(
                     comment=comment,
                     subcharacteristic=mc_result['label']
                 )
                 for comment, mc_result in zip(valid_comments, multiclass_results)
             ]
+
+            # Execute all LLM calls in parallel
+            descriptions = await asyncio.gather(*description_tasks)
+
+            logger.info(f"✓ Generated {len(descriptions)} descriptions in parallel")
 
         # Step 5: Build final results
         results = []

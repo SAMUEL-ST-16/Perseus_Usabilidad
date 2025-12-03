@@ -24,6 +24,9 @@ reportlab==4.0.8
 # ========== Utilities ==========
 python-dotenv==1.0.0
 
+# ========== Redis Cache ==========
+redis==5.0.1
+
 # ========== AI Services ==========
 openai==1.12.0
 

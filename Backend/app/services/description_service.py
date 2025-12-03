@@ -5,7 +5,7 @@ Generates human-readable descriptions for security requirements using AI
 
 from typing import Dict, Optional
 import os
-from openai import OpenAI
+from openai import AsyncOpenAI
 from app.core.config import settings
 from app.core.logger import get_logger
 
@@ -46,7 +46,7 @@ class DescriptionService:
         if provider == "groq" and settings.GROQ_API_KEY:
             # Try Groq first (prioritized)
             try:
-                self.openai_client = OpenAI(
+                self.openai_client = AsyncOpenAI(
                     api_key=settings.GROQ_API_KEY,
                     base_url="https://api.groq.com/openai/v1"
                 )
@@ -60,7 +60,7 @@ class DescriptionService:
         elif provider == "openai" and settings.OPENAI_API_KEY:
             # Try OpenAI if specified
             try:
-                self.openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+                self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
                 self.use_ai = True
                 self.provider = "openai"
                 self.model = "gpt-4o-mini"
@@ -72,7 +72,7 @@ class DescriptionService:
         if not self.use_ai:
             if settings.GROQ_API_KEY:
                 try:
-                    self.openai_client = OpenAI(
+                    self.openai_client = AsyncOpenAI(
                         api_key=settings.GROQ_API_KEY,
                         base_url="https://api.groq.com/openai/v1"
                     )
@@ -85,7 +85,7 @@ class DescriptionService:
 
             elif settings.OPENAI_API_KEY:
                 try:
-                    self.openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+                    self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
                     self.use_ai = True
                     self.provider = "openai"
                     self.model = "gpt-4o-mini"
@@ -96,13 +96,13 @@ class DescriptionService:
         if not self.use_ai:
             logger.warning("No AI client available - will use template-based descriptions")
 
-    def _generate_with_ai(
+    async def _generate_with_ai(
         self,
         comment: str,
         subcharacteristic: str
     ) -> Optional[str]:
         """
-        Generate description using AI (OpenAI/Groq)
+        Generate description using AI (OpenAI/Groq) - ASYNC
 
         Args:
             comment: Original user comment
@@ -137,8 +137,8 @@ Requisitos:
 
 IMPORTANTE: Devuelve SOLO la descripción del requisito, sin explicaciones adicionales."""
 
-            # Call API with configured model
-            response = self.openai_client.chat.completions.create(
+            # Call API with configured model (ASYNC)
+            response = await self.openai_client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": "Eres un experto en ingeniería de requisitos de seguridad."},
@@ -150,7 +150,7 @@ IMPORTANTE: Devuelve SOLO la descripción del requisito, sin explicaciones adici
 
             description = response.choices[0].message.content.strip()
 
-            logger.info(f"✓ Groq generated description for '{comment[:50]}...': {description[:100]}...")
+            logger.info(f"✓ {self.provider.upper()} generated description for '{comment[:50]}...': {description[:100]}...")
             return description
 
         except Exception as e:
@@ -186,13 +186,13 @@ IMPORTANTE: Devuelve SOLO la descripción del requisito, sin explicaciones adici
             "El sistema debe implementar medidas de seguridad apropiadas según las mejores prácticas de la industria."
         )
 
-    def generate_description(
+    async def generate_description(
         self,
         comment: str,
         subcharacteristic: str
     ) -> str:
         """
-        Generate a formal description for a security requirement
+        Generate a formal description for a security requirement - ASYNC with CACHE
 
         Uses AI if available, falls back to templates otherwise.
 
@@ -203,16 +203,31 @@ IMPORTANTE: Devuelve SOLO la descripción del requisito, sin explicaciones adici
         Returns:
             Generated description in formal requirement language
         """
-        # Try AI generation first
+        # Import redis service here to avoid circular imports
+        from app.services.redis_service import redis_service
+        from app.core.config import settings
+
+        # Try cache first
+        cache_key = redis_service._generate_key("llm_desc", comment, subcharacteristic, self.model)
+        cached = await redis_service.get(cache_key)
+        if cached is not None:
+            logger.info(f"🎯 Cache HIT for LLM description: {subcharacteristic}")
+            return cached
+
+        # Try AI generation
         if self.use_ai:
             logger.info(f"🤖 Generating AI description ({self.provider}) for: {subcharacteristic}")
-            ai_description = self._generate_with_ai(comment, subcharacteristic)
+            ai_description = await self._generate_with_ai(comment, subcharacteristic)
             if ai_description:
+                # Cache the result
+                await redis_service.set(cache_key, ai_description, ttl=settings.CACHE_TTL_LLM)
                 return ai_description
 
         # Fallback to template
         logger.warning(f"⚠️  Using template-based description for: {subcharacteristic}")
-        return self._generate_with_template(comment, subcharacteristic)
+        template_desc = self._generate_with_template(comment, subcharacteristic)
+        # Don't cache template descriptions
+        return template_desc
 
 
 # Global service instance

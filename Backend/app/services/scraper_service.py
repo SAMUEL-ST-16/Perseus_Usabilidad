@@ -4,6 +4,8 @@ Handles web scraping of Google Play Store reviews with intelligent filtering
 """
 
 import re
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from typing import List, Optional, Dict, Tuple
 from google_play_scraper import reviews, Sort
 from app.schemas.requirements import ScrapedComment
@@ -33,6 +35,7 @@ class ScraperService:
         """Initialize scraper service"""
         logger.info("Initializing Scraper Service with intelligent filtering")
         logger.info(f"Filters: Rating {self.MIN_RATING}-{self.MAX_RATING} stars, Min {self.MIN_WORDS} words")
+        self.executor = ThreadPoolExecutor(max_workers=4)
 
     def _extract_app_id(self, url: str) -> str:
         """
@@ -94,7 +97,7 @@ class ScraperService:
 
         return True
 
-    def scrape_reviews_smart(
+    def _scrape_reviews_smart_sync(
         self,
         url: str,
         target_valid_comments: int = 30,
@@ -103,11 +106,7 @@ class ScraperService:
         country: str = 'us'
     ) -> Tuple[List[ScrapedComment], Dict]:
         """
-        Smart scraping with progressive filtering
-
-        Stops when:
-        - Found target_valid_comments that meet criteria
-        - OR reached max_total_reviews
+        Synchronous version of smart scraping (to run in executor)
 
         Args:
             url: Play Store app URL
@@ -218,14 +217,84 @@ class ScraperService:
             logger.error(error_msg)
             raise ScrapingException(error_msg, details={"url": url, "error": str(e)})
 
-    def get_comments_only_smart(
+    async def scrape_reviews_smart(
+        self,
+        url: str,
+        target_valid_comments: int = 30,
+        max_total_reviews: int = 500,
+        language: str = 'es',
+        country: str = 'us'
+    ) -> Tuple[List[ScrapedComment], Dict]:
+        """
+        Smart scraping with progressive filtering - ASYNC with CACHE
+
+        Stops when:
+        - Found target_valid_comments that meet criteria
+        - OR reached max_total_reviews
+
+        Args:
+            url: Play Store app URL
+            target_valid_comments: Target number of valid comments (default: 30)
+            max_total_reviews: Maximum reviews to scrape (default: 500)
+            language: Review language filter
+            country: Country filter
+
+        Returns:
+            Tuple of (valid_comments, statistics)
+
+        Raises:
+            ScrapingException: If scraping fails
+        """
+        from app.services.redis_service import redis_service
+
+        # Extract app_id for caching
+        app_id = self._extract_app_id(url)
+
+        # Try cache first
+        cache_key = redis_service._generate_key(
+            "scraping",
+            app_id,
+            target_valid_comments,
+            max_total_reviews,
+            language,
+            country
+        )
+        cached = await redis_service.get(cache_key)
+        if cached is not None:
+            logger.info(f"🎯 Cache HIT for scraping: {app_id}")
+            # Reconstruct ScrapedComment objects from cached data
+            comments = [ScrapedComment(**c) for c in cached['comments']]
+            return comments, cached['stats']
+
+        # Run blocking scraping in executor
+        loop = asyncio.get_event_loop()
+        valid_comments, stats = await loop.run_in_executor(
+            self.executor,
+            self._scrape_reviews_smart_sync,
+            url,
+            target_valid_comments,
+            max_total_reviews,
+            language,
+            country
+        )
+
+        # Cache the result (convert to dict for JSON serialization)
+        cache_data = {
+            'comments': [c.model_dump() for c in valid_comments],
+            'stats': stats
+        }
+        await redis_service.set(cache_key, cache_data, ttl=settings.CACHE_TTL_SCRAPING)
+
+        return valid_comments, stats
+
+    async def get_comments_only_smart(
         self,
         url: str,
         target_comments: int = 30,
         max_total: int = 500
     ) -> Tuple[List[str], Dict]:
         """
-        Smart scraping that returns only comment texts with statistics
+        Smart scraping that returns only comment texts with statistics - ASYNC
 
         Args:
             url: Play Store app URL
@@ -235,7 +304,7 @@ class ScraperService:
         Returns:
             Tuple of (comment_texts, statistics)
         """
-        valid_comments, stats = self.scrape_reviews_smart(
+        valid_comments, stats = await self.scrape_reviews_smart(
             url,
             target_valid_comments=target_comments,
             max_total_reviews=max_total
