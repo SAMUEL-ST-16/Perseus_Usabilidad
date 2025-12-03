@@ -14,10 +14,9 @@ provider "digitalocean" {
   token = var.do_token
 }
 
-# SSH Key para acceder al droplet
-resource "digitalocean_ssh_key" "default" {
-  name       = "perseus-terraform-key"
-  public_key = var.ssh_public_key
+# Buscar SSH Key existente por fingerprint
+data "digitalocean_ssh_key" "existing" {
+  name = "extractreq-terraform-key"
 }
 
 # Droplet (servidor) en DigitalOcean
@@ -38,8 +37,8 @@ resource "digitalocean_droplet" "perseus" {
   # Imagen del sistema operativo
   image  = "ubuntu-22-04-x64"
 
-  # SSH key para acceso
-  ssh_keys = [digitalocean_ssh_key.default.id]
+  # SSH key para acceso - usa la existente
+  ssh_keys = [data.digitalocean_ssh_key.existing.id]
 
   # Script de inicialización (cloud-init)
   # Este script se ejecuta automáticamente cuando el droplet se crea
